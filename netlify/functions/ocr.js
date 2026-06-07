@@ -1,3 +1,5 @@
+const { callOCRSpace } = require('./utils/ocr-helper');
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -41,41 +43,23 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const params = new URLSearchParams();
-    params.append('apikey', apiKey);
-    params.append('base64Image', base64Image);
-    params.append('language', language || 'eng');
-    params.append('OCREngine', String(ocrEngine || 2));
-    params.append('isTable', 'false');
-    params.append('detectOrientation', 'true');
-    params.append('scale', 'true');
-    params.append('isCreateSearchablePdf', 'false');
-    params.append('isSearchablePdfHideTextLayer', 'false');
+    const parsedText = await callOCRSpace(base64Image, language || 'eng', ocrEngine || 2, apiKey);
 
-    const response = await fetch('https://api.ocr.space/parse/image', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: params.toString()
-    });
+    const mockResponse = {
+      ParsedResults: [
+        {
+          ParsedText: parsedText
+        }
+      ]
+    };
 
-    if (!response.ok) {
-      return {
-        statusCode: response.status,
-        headers,
-        body: JSON.stringify({ error: `OCR.space API responded with status ${response.status}` })
-      };
-    }
-
-    const data = await response.json();
     return {
       statusCode: 200,
       headers: {
         ...headers,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(mockResponse)
     };
   } catch (error) {
     console.error('OCR Function Error:', error);

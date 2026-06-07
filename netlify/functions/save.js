@@ -1,3 +1,5 @@
+const { saveToSheet } = require('./utils/save-helper');
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -35,34 +37,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const payload = {
-      ...data,
-      secretToken: secretToken || ''
-    };
-
-    const response = await fetch(googleScriptUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      return {
-        statusCode: response.status,
-        headers,
-        body: JSON.stringify({ error: `Google Script responded with status ${response.status}` })
-      };
-    }
-
-    const responseText = await response.text();
-    let responseData;
-    try {
-      responseData = JSON.parse(responseText);
-    } catch (e) {
-      responseData = { rawResponse: responseText };
-    }
+    const responseData = await saveToSheet(data, googleScriptUrl, secretToken);
 
     return {
       statusCode: 200,

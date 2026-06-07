@@ -10,3 +10,6 @@ Desktop.ini
 # Local Gemini / Antigravity files
 .gemini/
 brain/
+
+# Local environment variables
+.env

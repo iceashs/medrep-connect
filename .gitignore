@@ -1,0 +1,12 @@
+# System files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Local Gemini / Antigravity files
+.gemini/
+brain/
